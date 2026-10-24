@@ -1,0 +1,641 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HamsterMarket — Маркетплейс</title>
+<style>
+:root {
+  --bg:#070c12;
+  --panel:#0d1520;
+  --card:#101b29;
+  --line:#233449;
+  --gold:#ffc442;
+  --orange:#ff9d32;
+  --text:#f5f7fb;
+  --muted:#9baabd;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font:14px Arial,sans-serif;
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+button:focus-visible,a:focus-visible,input:focus-visible,
+select:focus-visible{outline:2px solid var(--gold)}
+header{
+  height:76px;background:#080e15;
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:24px;
+  padding:12px 24px;position:sticky;top:0;z-index:5;
+}
+.logo{min-width:245px;font-size:23px;font-weight:900}
+.logo span{color:var(--gold)}
+.logo small{display:block;color:var(--muted);font-size:11px;margin-top:5px}
+.search{flex:1;position:relative}
+.search input{
+  width:100%;padding:14px 44px 14px 17px;
+  border:1px solid #34465b;border-radius:30px;
+  background:var(--panel);color:white;
+}
+.search button{
+  position:absolute;right:12px;top:10px;
+  border:0;background:none;color:var(--gold);font-size:20px;
+}
+.header-btn{
+  background:none;color:white;border:0;white-space:nowrap;
+}
+.gold-btn{
+  border:0;background:linear-gradient(120deg,var(--gold),var(--orange));
+  color:#15120a;padding:12px 18px;border-radius:14px;
+  font-weight:800;transition:.2s;
+}
+.gold-btn:hover{filter:brightness(1.1);transform:translateY(-2px)}
+.layout{
+  display:grid;grid-template-columns:220px minmax(0,1fr) 280px;
+  gap:14px;padding:14px;
+  max-width:1800px;margin:auto;
+}
+.sidebar,.rightbar{min-width:0}
+.panel{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:17px;padding:17px;margin-bottom:15px;
+}
+.side-link{
+  display:block;padding:13px;border-radius:10px;
+  margin:4px 0;color:#c5d0df;
+}
+.side-link:hover,.side-link.active{
+  background:#27251c;color:var(--gold);
+}
+.promo{
+  background:linear-gradient(135deg,#302013,#111a24);
+  border:1px solid #63431f;border-radius:17px;
+  padding:18px;margin-top:15px;
+}
+.promo h3{color:var(--gold);margin-bottom:10px}
+.promo p{color:#d3d7de;line-height:1.6;margin-bottom:14px}
+.hero{
+  min-height:290px;border:1px solid #3a3022;
+  border-radius:19px;overflow:hidden;position:relative;
+  display:flex;align-items:center;
+  background:
+    linear-gradient(90deg,#100c08 0%,#160f08eF 36%,#100c0850 100%),
+    url("https://images.unsplash.com/photo-1425082661705-1834bfd09dca?auto=format&fit=crop&w=1300&q=85")
+    center 44%/cover;
+}
+.hero-content{padding:32px;max-width:510px}
+.eyebrow{
+  display:inline-block;border:1px solid #806128;
+  padding:7px 12px;border-radius:30px;
+  color:var(--gold);margin-bottom:17px;
+}
+.hero h1{font-size:clamp(30px,4vw,47px);line-height:1.1;margin-bottom:15px}
+.hero h1 span{color:var(--gold)}
+.hero p{color:#d5d5d5;line-height:1.7;margin-bottom:22px}
+.benefits{
+  display:flex;flex-wrap:wrap;gap:12px;
+  margin-top:16px;color:#ccd5e0;font-size:12px;
+}
+.benefits span{padding:8px 10px;background:#111923c9;border-radius:9px}
+.category-row{
+  display:flex;gap:9px;overflow-x:auto;
+  padding:15px 0;border-bottom:1px solid var(--line);
+}
+.chip{
+  flex-shrink:0;background:var(--panel);color:#dce4ef;
+  border:1px solid var(--line);border-radius:30px;padding:11px 16px;
+}
+.chip.active,.chip:hover{background:var(--gold);color:#17120a;border-color:var(--gold)}
+.section-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin:20px 0 14px;flex-wrap:wrap;
+}
+.section-head h2{font-size:22px}
+.muted{color:var(--muted)}
+.sort{
+  background:var(--panel);color:white;border:1px solid var(--line);
+  padding:10px;border-radius:9px;
+}
+.products{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+.product{
+  min-width:0;position:relative;overflow:hidden;
+  background:var(--card);border:1px solid var(--line);
+  border-radius:15px;padding:9px;transition:.2s;
+}
+.product:hover{border-color:#b48b3c;transform:translateY(-3px)}
+.product-image{position:relative}
+.product-image img{
+  width:100%;height:155px;object-fit:cover;
+  border-radius:10px;display:block;background:#26303b;
+}
+.tag{
+  position:absolute;top:8px;left:7px;background:#e74b69;
+  padding:5px 7px;border-radius:8px;font-size:10px;font-weight:bold;
+}
+.fav{
+  position:absolute;right:7px;top:7px;
+  width:29px;height:29px;border:0;border-radius:50%;
+  background:#101721dc;color:white;font-size:18px;
+}
+.fav.selected{color:#ff6585}
+.product h3{font-size:14px;margin:12px 0 7px;line-height:1.35}
+.product p{color:var(--muted);font-size:12px;line-height:1.5;min-height:36px}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin:10px 0}
+.tags span{font-size:10px;color:#bdcce0;background:#202e40;padding:5px 7px;border-radius:12px}
+.price-row{display:flex;align-items:center;justify-content:space-between;gap:5px;margin:12px 0}
+.price{font-weight:900;color:var(--gold);font-size:15px}
+.rating{font-size:11px;color:var(--gold);white-space:nowrap}
+.product-actions{display:flex;gap:6px}
+.qty{display:flex;align-items:center;gap:9px;background:#182535;border-radius:10px;padding:6px}
+.qty button{border:0;background:none;color:white;font-size:17px}
+.product-actions .gold-btn{flex:1;padding:9px 6px;font-size:12px}
+.empty{padding:35px;text-align:center;color:var(--muted);grid-column:1/-1}
+.cart-item{
+  display:grid;grid-template-columns:55px minmax(0,1fr);
+  gap:10px;padding:13px 0;border-bottom:1px solid var(--line);
+}
+.cart-item img{width:55px;height:60px;object-fit:cover;border-radius:10px}
+.cart-item h4{font-size:12px;line-height:1.4;margin-bottom:6px}
+.cart-item .price{font-size:12px}
+.cart-controls{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.cart-controls button{background:#202d3d;border:0;color:white;padding:5px 8px;border-radius:7px}
+.total{
+  display:flex;justify-content:space-between;gap:8px;
+  margin:17px 0;font-weight:bold;font-size:15px;
+}
+.total strong{color:var(--gold);text-align:right}
+.full{width:100%}
+.info-row{display:flex;gap:12px;align-items:center;margin:15px 0}
+.info-icon{
+  min-width:42px;height:42px;border-radius:50%;
+  display:grid;place-items:center;background:#282519;color:var(--gold);font-size:20px;
+}
+.info-row p{font-size:12px;color:var(--muted);line-height:1.6;margin-top:4px}
+footer{
+  padding:30px 20px;text-align:center;border-top:1px solid var(--line);
+  color:var(--muted);line-height:2;margin-top:20px;
+}
+footer b{color:var(--gold)}
+dialog{
+  width:min(500px,calc(100% - 25px));margin:auto;
+  background:#0d1520;color:white;border:1px solid var(--line);
+  border-radius:20px;padding:24px;
+}
+dialog::backdrop{background:#000b}
+dialog h2{margin-bottom:16px}
+.form-field{margin:13px 0}
+.form-field label{display:block;margin-bottom:7px}
+.form-field input,.form-field textarea,.form-field select{
+  width:100%;padding:12px;border-radius:9px;
+  border:1px solid var(--line);background:#101b29;color:white;
+}
+.form-actions{display:flex;gap:10px;margin-top:18px}
+.form-actions button{flex:1}
+.secondary{border:1px solid var(--line);background:#172333;color:white;border-radius:12px;padding:12px}
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:#182b20;color:#b8f4c8;border:1px solid #356346;
+  padding:13px 20px;border-radius:12px;z-index:20;
+  display:none;max-width:90%;text-align:center;
+}
+@media(max-width:1250px){
+  .layout{grid-template-columns:190px minmax(0,1fr)}
+  .rightbar{grid-column:2}
+  .sidebar{grid-row:1 / span 2}
+  .products{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:850px){
+  header{height:auto;flex-wrap:wrap;padding:14px}
+  .logo{min-width:0;flex:1}
+  .search{order:5;flex-basis:100%}
+  .layout{grid-template-columns:1fr;padding:10px}
+  .sidebar{grid-row:auto}
+  .sidebar .panel:first-child{display:flex;gap:5px;overflow-x:auto;padding:8px}
+  .side-link{white-space:nowrap}
+  .rightbar{grid-column:auto}
+  .products{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero{min-height:300px}
+}
+@media(max-width:430px){
+  .products{grid-template-columns:1fr 1fr;gap:7px}
+  .product{padding:7px}
+  .product-image img{height:125px}
+  .product h3{font-size:12px}
+  .price{font-size:12px}
+  .rating{font-size:10px}
+  .product-actions{flex-wrap:wrap}
+  .product-actions .gold-btn{min-width:100%}
+  .hero-content{padding:22px}
+  .hero h1{font-size:32px}
+  .header-btn{font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#home">🐹 Hamster<span>Market</span>
+    <small>Маленькие друзья — большое счастье</small>
+  </a>
+
+  <div class="search">
+    <input id="search" placeholder="Найти хомячка, породу..." aria-label="Поиск товаров">
+    <button onclick="renderProducts()" aria-label="Поиск">⌕</button>
+  </div>
+
+  <button class="header-btn" onclick="showFavorites()">♡ Избранное <span id="fav-count">0</span></button>
+  <button class="header-btn" onclick="notify('В демоверсии регистрация не подключена')">♙ Войти</button>
+  <button class="gold-btn" onclick="document.getElementById('cart-panel').scrollIntoView({behavior:'smooth'})">🛒 <span id="header-count">0</span></button>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="panel">
+      <a class="side-link active" href="#home">⌂ Главная</a>
+      <a class="side-link" href="#catalog">♧ Каталог</a>
+      <a class="side-link" href="#catalog" onclick="setCategory('Новинки')">✦ Новинки</a>
+      <a class="side-link" href="#catalog" onclick="setCategory('Популярные')">♨ Популярные</a>
+      <a class="side-link" href="#deals">♢ Акции</a>
+      <a class="side-link" href="#reviews">★ Отзывы</a>
+      <a class="side-link" href="#delivery">♧ Доставка и оплата</a>
+    </div>
+
+    <div class="promo" id="deals">
+      <h3>🎁 Скидка 10%</h3>
+      <p>На первый заказ от 200 000 сум.</p>
+      <button class="gold-btn" onclick="notify('Промокод: HAMSTER10. Скидка демонстрационная.')">HAMSTER10</button>
+    </div>
+
+    <div class="panel" style="margin-top:15px">
+      <h3>Наш маркетплейс</h3>
+      <p class="muted" style="line-height:1.8;margin-top:10px">
+        Проверенные продавцы<br>
+        Выбор пород<br>
+        Помощь с уходом<br>
+        Поддержка покупателей
+      </p>
+    </div>
+  </aside>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-content">
+        <span class="eyebrow">✦ МИР ПУШИСТЫХ ДРУЗЕЙ</span>
+        <h1>Хомячки — <span>маленькие комочки счастья!</span></h1>
+        <p>Выбирай породу, изучай предложения и готовь уютный дом для нового друга.</p>
+        <button class="gold-btn" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Перейти к каталогу →</button>
+        <div class="benefits">
+          <span>🛡 Ответственные продавцы</span>
+          <span>🚚 Доставка по Узбекистану</span>
+          <span>♡ Советы по уходу</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="category-row" id="categories">
+      <button class="chip active" data-category="Все" onclick="setCategory('Все')">▦ Все породы</button>
+      <button class="chip" data-category="Сирийские" onclick="setCategory('Сирийские')">🐹 Сирийские</button>
+      <button class="chip" data-category="Джунгарские" onclick="setCategory('Джунгарские')">🐹 Джунгарские</button>
+      <button class="chip" data-category="Роборовского" onclick="setCategory('Роборовского')">🐹 Роборовского</button>
+      <button class="chip" data-category="Кэмпбелл" onclick="setCategory('Кэмпбелл')">🐹 Кэмпбелл</button>
+      <button class="chip" data-category="Длинношёрстные" onclick="setCategory('Длинношёрстные')">🐹 Длинношёрстные</button>
+    </div>
+
+    <section id="catalog">
+      <div class="section-head">
+        <h2>🔥 Популярные хомячки</h2>
+        <select class="sort" id="sort" onchange="renderProducts()" aria-label="Сортировка">
+          <option value="popular">Сначала популярные</option>
+          <option value="cheap">Сначала дешевле</option>
+          <option value="expensive">Сначала дороже</option>
+          <option value="rating">По рейтингу</option>
+        </select>
+      </div>
+
+      <p class="muted" id="result-count" style="margin-bottom:12px"></p>
+      <div class="products" id="products"></div>
+    </section>
+
+    <section class="panel" id="reviews" style="margin-top:20px">
+      <h2>⭐ Почему выбирают нас?</h2>
+      <div class="benefits">
+        <span>🐾 Информация о породах</span>
+        <span>🛡 Ответственные продавцы</span>
+        <span>🚚 Согласование доставки</span>
+        <span>💳 Удобные способы оплаты</span>
+      </div>
+      <p class="muted" style="margin-top:16px;line-height:1.7">
+        Перед покупкой узнай условия содержания, возраст питомца и его состояние здоровья.
+        Фактические гарантии и сведения о продавцах необходимо проверить перед запуском магазина.
+      </p>
+    </section>
+  </main>
+
+  <aside class="rightbar">
+    <div class="panel" id="cart-panel">
+      <div class="section-head" style="margin:0 0 8px">
+        <h2>🛒 Корзина</h2>
+        <button class="header-btn" onclick="clearCart()">Очистить</button>
+      </div>
+
+      <div id="cart-items"></div>
+
+      <div class="total">
+        <span>Итого:</span>
+        <strong id="cart-total">0 сум</strong>
+      </div>
+
+      <button class="gold-btn full" onclick="openCheckout()">Оформить заказ →</button>
+      <p class="muted" style="font-size:11px;line-height:1.6;margin-top:12px">
+        Заказ демонстрационный. Реальная оплата пока не подключена.
+      </p>
+    </div>
+
+    <div class="panel" id="delivery">
+      <h3>🚚 Доставка</h3>
+      <p class="muted" style="margin-top:9px;line-height:1.7">
+        Ташкент, Самарканд, Бухара и другие города. Возможность и условия перевозки животных согласовываются с продавцом.
+      </p>
+    </div>
+
+    <div class="panel">
+      <div class="info-row">
+        <div class="info-icon">♡</div>
+        <div><b>Здоровье питомцев</b><p>Уточняй ветеринарные документы и состояние животного.</p></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon">▤</div>
+        <div><b>Удобная оплата</b><p>Наличные, Click или Payme после настройки интеграции.</p></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon">♧</div>
+        <div><b>Поддержка</b><p>Добавь контакты продавца и службу помощи покупателям.</p></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  <b>🐹 HamsterMarket</b><br>
+  Маркетплейс для тех, кто любит маленьких питомцев.<br>
+  <span>© 2026 HamsterMarket · Демонстрационный проект</span>
+</footer>
+
+<dialog id="checkout-dialog">
+  <h2>Оформление заказа 🐹</h2>
+  <form id="checkout-form">
+    <div class="form-field">
+      <label for="customer">Имя покупателя</label>
+      <input id="customer" required maxlength="80" placeholder="Ваше имя">
+    </div>
+    <div class="form-field">
+      <label for="phone">Телефон</label>
+      <input id="phone" type="tel" required placeholder="+998 90 123 45 67">
+    </div>
+    <div class="form-field">
+      <label for="address">Адрес</label>
+      <textarea id="address" required maxlength="300" placeholder="Город, улица, дом"></textarea>
+    </div>
+    <div class="form-field">
+      <label for="payment">Способ оплаты</label>
+      <select id="payment" required>
+        <option value="">Выбрать</option>
+        <option>Наличными при получении</option>
+        <option>Click — требует подключения</option>
+        <option>Payme — требует подключения</option>
+      </select>
+    </div>
+    <div class="total"><span>К оплате</span><strong id="checkout-total">0 сум</strong></div>
+    <div class="form-actions">
+      <button class="secondary" type="button" onclick="closeCheckout()">Отмена</button>
+      <button class="gold-btn" type="submit">Подтвердить</button>
+    </div>
+    <p class="muted" style="margin-top:14px;line-height:1.6;font-size:11px">
+      Демоверсия не отправляет персональные данные и не принимает оплату.
+    </p>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const productsData = [
+ {id:1,name:"Сирийский хомячок",category:"Сирийские",price:120000,rating:4.9,reviews:124,tag:"Хит продаж",desc:"Спокойный и любознательный. Часто подходит новичкам.",size:"Крупный",seller:"Happy Paws",image:"https://images.unsplash.com/photo-1425082661705-1834bfd09dca?auto=format&fit=crop&w=500&q=80"},
+ {id:2,name:"Джунгарский хомячок",category:"Джунгарские",price:80000,rating:4.8,reviews:98,tag:"Популярный",desc:"Карликовый, активный и очень любопытный.",size:"Маленький",seller:"Little Friends",image:"https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=500&q=80"},
+ {id:3,name:"Хомячок Роборовского",category:"Роборовского",price:100000,rating:4.7,reviews:76,tag:"Новинка",desc:"Очень маленький и быстрый. Любит наблюдать за миром.",size:"Мини",seller:"Hammy World",image:"https://images.unsplash.com/photo-1535241749838-299277b6305f?auto=format&fit=crop&w=500&q=80"},
+ {id:4,name:"Длинношёрстный хомячок",category:"Длинношёрстные",price:150000,rating:4.9,reviews:52,tag:"Премиум",desc:"Пушистый питомец, требующий внимательного ухода.",size:"Крупный",seller:"Happy Paws",image:"https://images.unsplash.com/photo-1504006833117-8886a355efbf?auto=format&fit=crop&w=500&q=80"},
+ {id:5,name:"Хомячок Кэмпбелла",category:"Кэмпбелл",price:90000,rating:4.6,reviews:45,tag:"Выгодно",desc:"Карликовый вид с активным характером.",size:"Маленький",seller:"Little Friends",image:"https://images.unsplash.com/photo-1535241749838-299277b6305f?auto=format&fit=crop&w=500&q=80"},
+ {id:6,name:"Золотистый сирийский",category:"Сирийские",price:135000,rating:4.9,reviews:81,tag:"Популярный",desc:"Золотистая шерсть и любознательный характер.",size:"Крупный",seller:"Hammy World",image:"https://images.unsplash.com/photo-1425082661705-1834bfd09dca?auto=format&fit=crop&w=500&q=80"},
+ {id:7,name:"Карликовый хомячок",category:"Джунгарские",price:85000,rating:4.5,reviews:37,tag:"Новинка",desc:"Небольшой питомец с активным образом жизни.",size:"Мини",seller:"Happy Paws",image:"https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=500&q=80"},
+ {id:8,name:"Хомячок сибирский",category:"Джунгарские",price:110000,rating:4.8,reviews:61,tag:"Выбор дня",desc:"Проверьте особенности вида у продавца перед покупкой.",size:"Маленький",seller:"Little Friends",image:"https://images.unsplash.com/photo-1504006833117-8886a355efbf?auto=format&fit=crop&w=500&q=80"}
+];
+
+const money = n => new Intl.NumberFormat("ru-RU").format(n) + " сум";
+let cart = [];
+let favorites = new Set();
+let category = "Все";
+let favoritesOnly = false;
+
+function notify(message){
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.style.display = "block";
+  clearTimeout(notify.timer);
+  notify.timer = setTimeout(()=>toast.style.display="none",2600);
+}
+
+function setCategory(value){
+  category = value;
+  favoritesOnly = false;
+  document.querySelectorAll("[data-category]").forEach(btn=>{
+    btn.classList.toggle("active",btn.dataset.category===value);
+  });
+  renderProducts();
+}
+
+function showFavorites(){
+  favoritesOnly = !favoritesOnly;
+  category = "Все";
+  document.querySelectorAll("[data-category]").forEach(btn=>{
+    btn.classList.toggle("active",btn.dataset.category==="Все");
+  });
+  renderProducts();
+  document.getElementById("catalog").scrollIntoView({behavior:"smooth"});
+  if(favoritesOnly) notify("Показаны избранные товары");
+}
+
+function renderProducts(){
+  const query = document.getElementById("search").value.trim().toLowerCase();
+  const sort = document.getElementById("sort").value;
+
+  let list = productsData.filter(p=>{
+    const matchesCategory = category==="Все" ||
+      p.category===category ||
+      (category==="Популярные" && p.rating>=4.8) ||
+      (category==="Новинки" && p.tag==="Новинка");
+    const matchesSearch = (p.name+" "+p.category+" "+p.seller).toLowerCase().includes(query);
+    const matchesFavorites = !favoritesOnly || favorites.has(p.id);
+    return matchesCategory && matchesSearch && matchesFavorites;
+  });
+
+  if(sort==="cheap") list.sort((a,b)=>a.price-b.price);
+  if(sort==="expensive") list.sort((a,b)=>b.price-a.price);
+  if(sort==="rating") list.sort((a,b)=>b.rating-a.rating);
+  if(sort==="popular") list.sort((a,b)=>b.reviews-a.reviews);
+
+  document.getElementById("result-count").textContent =
+    "Найдено товаров: "+list.length;
+
+  document.getElementById("products").innerHTML = list.length ? list.map(p=>`
+    <article class="product">
+      <div class="product-image">
+        <img src="${p.image}" alt="${p.name}" loading="lazy">
+        <span class="tag">${p.tag}</span>
+        <button class="fav ${favorites.has(p.id)?"selected":""}"
+          onclick="toggleFavorite(${p.id})"
+          aria-label="Добавить в избранное">${favorites.has(p.id)?"♥":"♡"}</button>
+      </div>
+      <h3>${p.name}</h3>
+      <p>${p.desc}</p>
+      <div class="tags"><span>${p.size}</span><span>${p.category}</span></div>
+      <p>Продавец: ${p.seller}</p>
+      <div class="price-row">
+        <span class="price">${money(p.price)}</span>
+        <span class="rating">★ ${p.rating} (${p.reviews})</span>
+      </div>
+      <div class="product-actions">
+        <button class="gold-btn" onclick="addToCart(${p.id})">🛒 В корзину</button>
+      </div>
+    </article>
+  `).join("") : '<div class="empty">Ничего не найдено. Измени запрос или категорию.</div>';
+}
+
+function toggleFavorite(id){
+  favorites.has(id) ? favorites.delete(id) : favorites.add(id);
+  document.getElementById("fav-count").textContent = favorites.size;
+  renderProducts();
+}
+
+function addToCart(id){
+  const found = cart.find(item=>item.id===id);
+  if(found) found.quantity++;
+  else cart.push({id,quantity:1});
+  renderCart();
+  notify("Товар добавлен в корзину 🐹");
+}
+
+function changeQty(id,delta){
+  const item = cart.find(i=>i.id===id);
+  if(!item) return;
+  item.quantity+=delta;
+  if(item.quantity<=0) cart=cart.filter(i=>i.id!==id);
+  renderCart();
+}
+
+function removeItem(id){
+  cart=cart.filter(i=>i.id!==id);
+  renderCart();
+}
+
+function clearCart(){
+  cart=[];
+  renderCart();
+  notify("Корзина очищена");
+}
+
+function total(){
+  return cart.reduce((sum,item)=>{
+    const p=productsData.find(p=>p.id===item.id);
+    return sum+(p?p.price*item.quantity:0);
+  },0);
+}
+
+function renderCart(){
+  const count=cart.reduce((sum,item)=>sum+item.quantity,0);
+  document.getElementById("header-count").textContent=count;
+  document.getElementById("cart-total").textContent=money(total());
+
+  const container=document.getElementById("cart-items");
+  if(!cart.length){
+    container.innerHTML='<p class="muted" style="padding:22px 0;text-align:center">Корзина пуста 🐹<br>Добавь понравившегося питомца.</p>';
+  }else{
+    container.innerHTML=cart.map(item=>{
+      const p=productsData.find(p=>p.id===item.id);
+      return `<div class="cart-item">
+        <img src="${p.image}" alt="${p.name}">
+        <div>
+          <h4>${p.name}</h4>
+          <span class="price">${money(p.price*item.quantity)}</span>
+          <div class="cart-controls">
+            <div class="qty">
+              <button onclick="changeQty(${p.id},-1)" aria-label="Уменьшить">−</button>
+              <span>${item.quantity}</span>
+              <button onclick="changeQty(${p.id},1)" aria-label="Увеличить">+</button>
+            </div>
+            <button onclick="removeItem(${p.id})" aria-label="Удалить товар">✕</button>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+  }
+}
+
+function openCheckout(){
+  if(!cart.length){
+    notify("Сначала добавь товар в корзину");
+    return;
+  }
+  document.getElementById("checkout-total").textContent=money(total());
+  document.getElementById("checkout-dialog").showModal();
+}
+
+function closeCheckout(){
+  document.getElementById("checkout-dialog").close();
+}
+
+document.getElementById("search").addEventListener("input",renderProducts);
+
+document.getElementById("checkout-form").addEventListener("submit",event=>{
+  event.preventDefault();
+  if(!cart.length){
+    closeCheckout();
+    notify("Корзина пуста");
+    return;
+  }
+
+  const name=document.getElementById("customer").value.trim();
+  const orderNumber="HM-"+Date.now().toString().slice(-7);
+  const summary=cart.map(item=>{
+    const p=productsData.find(p=>p.id===item.id);
+    return `${p.name} × ${item.quantity}`;
+  }).join("\n");
+
+  alert(
+    "ДЕМО-ЗАКАЗ "+orderNumber+"\n\n"+
+    "Покупатель: "+name+"\n\n"+
+    summary+"\n\n"+
+    "Итого: "+money(total())+
+    "\n\nЗаказ не отправлен продавцу, оплата не произведена."
+  );
+
+  closeCheckout();
+  cart=[];
+  renderCart();
+  event.target.reset();
+  notify("Демонстрация заказа завершена");
+});
+
+document.getElementById("fav-count").textContent=favorites.size;
+renderProducts();
+renderCart();
+</script>
+</body>
+</html>
